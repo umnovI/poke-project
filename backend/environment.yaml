@@ -1,0 +1,27 @@
+name: pokemon_project
+channels:
+- conda-forge
+- defaults
+dependencies:
+- python=3.12.1=h2628c8c_1_cpython
+- pre-commit=3.6.1=pyha770c72_0
+- pytest=8.0.0=pyhd8ed1ab_0
+- requests=2.31.0=pyhd8ed1ab_0
+- fastapi=0.109.2=pyhd8ed1ab_0
+- uvicorn=0.27.1=py312h2e8e312_0
+- httpx=0.26.0=pyhd8ed1ab_0
+- pytest-timeout=2.2.0=pyhd8ed1ab_0
+- locust=2.23.1=pyhd8ed1ab_0
+- pytest-dependency=0.5.1=pyh9f0ad1d_0
+- invoke=2.2.0=pyhd8ed1ab_0
+- pytest-cov=4.1.0=pyhd8ed1ab_0
+- sqlmodel=0.0.14=pyhd8ed1ab_0
+- pymysql=1.1.0=pyhd8ed1ab_0
+- ujson=5.9.0=py312h53d5487_0
+- ruff=0.2.1=py312h60fbdae_0
+- thefuzz=0.22.1=pyhd8ed1ab_0
+- pip=24.0=pyhd8ed1ab_0
+- pip:
+  - fastapi-analytics==1.2.1
+  - hishel==0.0.24
+  - pytest-httpx==0.28.0
