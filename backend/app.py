@@ -10,6 +10,7 @@ from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Query, Resp
 from fastapi.responses import FileResponse
 from pydantic import Base64UrlStr, Json
 from thefuzz import process
+from werkzeug.utils import secure_filename
 
 from backend.common import generate_hash
 from backend.db_config import close_db_connections, create_tables
@@ -89,13 +90,15 @@ async def get_media_file(
             },
         )
     if l:
-        filepath = Path(f"./backend/static/{quote_plus(l)}")
-        if filepath.is_file():
-            statresult = filepath.stat()
-            etag = generate_hash(str(statresult.st_size) + "-" + str(statresult.st_mtime), 10)
-            if cache_control != "no-cache":
-                await etag_compare(if_none_match, {"etag": etag})
-            return FileResponse(filepath, headers={"etag": etag})
+        sfilename = secure_filename(l)
+        if sfilename:
+            filepath = Path(f"./backend/static/{sfilename}")
+            if filepath.is_file():
+                statresult = filepath.stat()
+                etag = generate_hash(str(statresult.st_size) + "-" + str(statresult.st_mtime), 10)
+                if cache_control != "no-cache":
+                    await etag_compare(if_none_match, {"etag": etag})
+                return FileResponse(filepath, headers={"etag": etag})
 
         raise HTTPException(404)
 
