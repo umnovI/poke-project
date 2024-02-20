@@ -1,19 +1,16 @@
 import axios from "axios";
-import { Pagination } from "flowbite-react";
-import { useState } from "react";
 import { useQuery } from "react-query";
+import ItemsTPL from "./ItemsTPL";
 
-export default function Component({ openedPage }) {
-  console.log(openedPage);
+export default function Items({
+  itemsPerPage,
+  currentPage,
+  currentOffset,
+  setCurrentPage,
+  setOffset,
+}) {
   let itemCount = null;
   let totalPages = null;
-  const itemsPerPage = 18;
-  const [currentPage, setCurrentPage] = useState(
-    !openedPage ? 1 : parseInt(openedPage)
-  );
-  const [currentOffset, setOffset] = useState(
-    !openedPage ? 0 : parseInt(openedPage) * itemsPerPage - itemsPerPage
-  );
 
   const {
     isLoading,
@@ -55,41 +52,19 @@ export default function Component({ openedPage }) {
     document.title = "Pokedex";
   }
 
+  let paginationData = {
+    currentPage: currentPage,
+    totalPages: totalPages,
+    onPageChange: onPageChange,
+  };
+
   return (
-    <>
-      {isLoading && <div>Fetching data...</div>}
-      {error && <div>{error.message}</div>}
-      <div className="grid gap-x-8 gap-y-4 grid-cols-3">
-        {response &&
-          response.data.results.map((pokemon) => (
-            <div
-              className="bg-neutral-200 rounded-lg shadow-lg p-10"
-              key={pokemon.name}
-            >
-              <div className="grid justify-items-center">
-                <div>{pokemon.name}</div>
-                <div>
-                  <img
-                    src={
-                      pokemon.sprites.front_default ??
-                      "/api/media/?l=empty-url.jpg"
-                    }
-                    alt={pokemon.name ?? "empty"}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-      </div>
-      {itemCount && (
-        <div className="flex overflow-x-auto sm:justify-center pt-5 pb-10">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
-        </div>
-      )}
-    </>
+    <ItemsTPL
+      isLoading={isLoading}
+      error={error}
+      response={response}
+      itemCount={itemCount}
+      paginationData={paginationData}
+    />
   );
 }
