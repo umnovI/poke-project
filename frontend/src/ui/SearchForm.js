@@ -5,10 +5,8 @@ import { useQuery } from "react-query";
 
 export default function Component({
   setFoundData,
-  setSearchQuery,
   currentOffset,
   itemsPerPage,
-  searchQuery,
 }) {
   const [input, setInput] = useState(null);
   const [query, setQuery] = useState(null);
@@ -37,34 +35,16 @@ export default function Component({
       }
     } else {
       setQuery(null);
-      setSearchQuery(null);
-      window.history.replaceState(
-        null,
-        "", // Historical empty string
-        "/"
-      );
     }
   }
 
   useEffect(() => {
-    if (searchQuery) {
-      setQuery(searchQuery);
-    }
-    setSearchQuery(query);
     if (!isLoading && !error && response) {
       setFoundData(response);
-    } else if (!query) {
+    } else if (!response) {
       setFoundData(null);
     }
-  }, [
-    isLoading,
-    error,
-    response,
-    query,
-    setFoundData,
-    setSearchQuery,
-    searchQuery,
-  ]);
+  }, [isLoading, error, response, query, setFoundData]);
 
   return (
     <>

@@ -29,11 +29,6 @@ export default function Items({
     console.log("onPageChange has been triggered.");
     setCurrentPage(page);
     console.log("offset: ", page * itemsPerPage - itemsPerPage);
-    window.history.replaceState(
-      null,
-      "", // Historical empty string
-      `/?page=${page}`
-    );
     document.title = `Pokedex | Page ${page}`;
     setOffset(page * itemsPerPage - itemsPerPage);
     console.log("trigger refetch");
@@ -45,11 +40,6 @@ export default function Items({
   if (response) {
     itemCount = response.data.count;
     totalPages = Math.ceil(itemCount / itemsPerPage);
-  }
-
-  if (currentPage === 1) {
-    window.history.replaceState(null, "", "/");
-    document.title = "Pokedex";
   }
 
   let paginationData = {

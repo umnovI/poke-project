@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import LeftFilter from "./ui/Filters/Left/Filter";
 import SortingOrder from "./ui/Filters/Top/SortingOrder";
@@ -13,8 +13,6 @@ export default function App() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const openedPage = urlParams.get("page") ? urlParams.get("page") : null;
-  const openedQuery = urlParams.get("search") ? urlParams.get("search") : null;
-  const [searchQuery, setSearchQuery] = useState(null);
   const [foundData, setFoundData] = useState(null);
   const itemsPerPage = 18;
   const [currentPage, setCurrentPage] = useState(
@@ -24,19 +22,14 @@ export default function App() {
     !openedPage ? 0 : parseInt(openedPage) * itemsPerPage - itemsPerPage
   );
   console.log("Found data:", foundData);
-  useEffect(() => {
-    setSearchQuery(openedQuery);
-  }, [openedQuery]);
 
   return (
     <div className="container-body md:container md:mx-auto pt-16 px-3">
       <QueryClientProvider client={queryClientSearch}>
         <SearchForm
           setFoundData={setFoundData}
-          setSearchQuery={setSearchQuery}
           itemsPerPage={itemsPerPage}
           currentOffset={currentOffset}
-          searchQuery={searchQuery}
         />
       </QueryClientProvider>
 
@@ -59,7 +52,6 @@ export default function App() {
                   searchData={foundData}
                   openedPage={openedPage}
                   itemsPerPage={itemsPerPage}
-                  searchQuery={searchQuery}
                   currentPage={currentPage}
                   setCurrentPage={setCurrentPage}
                   setOffset={setOffset}

@@ -3,7 +3,6 @@ import ItemsTPL from "./ItemsTPL";
 export default function FoundItems({
   searchData,
   itemsPerPage,
-  searchQuery,
   setCurrentPage,
   currentPage,
   setOffset,
@@ -16,21 +15,8 @@ export default function FoundItems({
   const onPageChange = (page) => {
     console.log("onPageChange has been triggered.");
     setCurrentPage(page);
-    window.history.replaceState(
-      null,
-      "", // Historical empty string
-      `/?search=${searchQuery}&page=${page}`
-    );
-    document.title = `Pokedex | Page ${page}`;
     setOffset(page * itemsPerPage - itemsPerPage);
   };
-  if (searchQuery && (currentPage === 1 || !currentPage)) {
-    window.history.replaceState(
-      null,
-      "", // Historical empty string
-      `/?search=${searchQuery}`
-    );
-  }
   const paginationData = {
     currentPage: currentPage,
     totalPages: Math.ceil(itemCount / itemsPerPage),
