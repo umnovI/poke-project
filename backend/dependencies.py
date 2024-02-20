@@ -157,7 +157,8 @@ class Paginator:
             return self.__pages
         return self.__pages
 
-    def get_count(self) -> int:
+    @property
+    def count(self) -> int:
         """Count number of items in list"""
 
         return self.__count
@@ -175,6 +176,7 @@ class Paginator:
             return self.__items[: self.__limit]
         return self.__items
 
+    @property
     def has_next(self) -> bool:
         """Has next page?"""
 
@@ -182,7 +184,8 @@ class Paginator:
             return False
         return True
 
-    def generate_next(self) -> dict[str, int] | None:
+    @property
+    def next(self) -> dict[str, int] | None:
         """Generate dict with params for the next page
 
         Returns:

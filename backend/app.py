@@ -170,9 +170,9 @@ async def get_item_by_search(
     # we'd have to go over 1000+ items instead of `limit`
     paginator = Paginator(found, pagination["limit"], pagination["offset"])
     result = await build_found_list(subject.value, paginator.paginate())
-    result["count"] = paginator.get_count()
-    next_query = paginator.generate_next()
-    if next_query and paginator.has_next():
+    result["count"] = paginator.count
+    next_query = paginator.next
+    if next_query and paginator.has_next:
         result["next"] = f"/api/search/{subject.value}/?{urlencode(query=next_query)}&q={query}"
     else:
         result["next"] = None
