@@ -14,7 +14,7 @@ from sqlmodel import select
 from backend.api import format_links
 from backend.common import b64d, b64e, generate_hash
 from backend.db_config import TContent, THeaders, TRequestedURL, db_engine
-from backend.dependencies import lock1, lock2, make_request, raise_httpexception, request_headers
+from backend.dependencies import lock1, lock2, make_request, request_headers
 from backend.schemas import CreatedOutput, DataForRequest, PokemonDetailed, ResponseData
 from backend.shared_config import CACHE_TTL, HOST
 
@@ -35,9 +35,8 @@ async def create_pokemon_detailed(endpoint: str, query: dict | None = None) -> C
             for pokemon in poke_list.body["results"]:
                 remote_requests.append(tg.create_task(make_request(pokemon["url"], backend=True)))
                 source.append(pokemon["url"])
-    except ExceptionGroup:  # pragma: no cover
-        print(list(result.result() for result in remote_requests))
-        await raise_httpexception(500, "Internal Server Error")
+    except ExceptionGroup as e:  # pragma: no cover
+        raise e
 
     for idx, result in enumerate(remote_requests):
         poke_list_detailed["results"][idx]["sprites"] = result.result().body["sprites"]

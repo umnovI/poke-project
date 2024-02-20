@@ -1,7 +1,7 @@
 from asyncio import Lock
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 from urllib.parse import quote_plus
 
 import ujson
@@ -16,6 +16,7 @@ from backend.common import generate_hash
 from backend.db_config import close_db_connections, create_tables
 from backend.dependencies import PaginationQuery, etag_compare, make_media_request, make_request
 from backend.endpoints import EndpointName
+from backend.filters import build_found_list
 from backend.localdata import get_local_data
 from backend.schemas import DataForRequest
 from backend.secrets import ANALYTICS_API
@@ -159,12 +160,16 @@ async def get_item_by_search(
             headers={"cache-control": cache_control} if cache_control is not None else None,
         ),
     )
-    data = ujson.loads(data.body)
-    names = [result["name"] for result in data["results"]]
+    parsed_data: dict[str, Any] = ujson.loads(data.body)
+    names = [result["name"] for result in parsed_data["results"]]
     # Package doesn't support type hints
     # Follow this PR to know if this has changed https://github.com/seatgeek/thefuzz/pull/71
-    found = process.extract(query, names)  # type: ignore
-    return found
+    found: list[tuple] = process.extractBests(query, names, score_cutoff=80, limit=30)  # type: ignore
+    # We need to get icons on them. We can't get this during prev step bc
+    # we'd have to go over 1000+ items instead of `limit`
+    result = await build_found_list(subject.value, found)
+
+    return result
 
 
 @app.get("/api/filter/{subject}/")
