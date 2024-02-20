@@ -41,7 +41,7 @@ export default function Component({
   useEffect(() => {
     if (!isLoading && !error && response) {
       setFoundData(response);
-    } else if (!response) {
+    } else if (!query) {
       setFoundData(null);
     }
   }, [isLoading, error, response, query, setFoundData]);
