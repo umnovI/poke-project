@@ -1,14 +1,10 @@
-.log
 **/logs/
 /data
 *cache*
 .vscode/*
-# !.vscode/tasks.json
 /tmp
 /.tmp
-test.py
 /instance
-*-dnt.*
 .coverage
 *.sqlite
 *.db
