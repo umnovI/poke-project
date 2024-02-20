@@ -1,3 +1,4 @@
+import math
 from asyncio import Lock
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -149,6 +150,7 @@ async def get_pokemon_detailed(
 @app.get("/api/search/{subject}/")
 async def get_item_by_search(
     subject: EndpointName,
+    pagination: PaginationQuery,
     q: str,
     cache_control: Annotated[str | None, Header()] = None,
 ):
@@ -167,7 +169,29 @@ async def get_item_by_search(
     found: list[tuple] = process.extractBests(query, names, score_cutoff=80, limit=30)  # type: ignore
     # We need to get icons on them. We can't get this during prev step bc
     # we'd have to go over 1000+ items instead of `limit`
+    has_next: bool = False
+    count: int = len(found)
+    limit: int | None = pagination["limit"]
+    offset: int | None = pagination["offset"]
+    pages: int = 1
+    cur_page: int = 1
+    if limit is not None and count > limit:
+        pages = math.ceil(count / limit)
+        print(pages)
+        if offset:
+            cur_page = pages - math.ceil(offset - limit)
+            print(cur_page)
+            has_next = True
+            found = found[offset : limit + offset]
+        else:
+            has_next = True
+            found = found[:limit]
+        if cur_page == pages:
+            has_next = False
+
     result = await build_found_list(subject.value, found)
+    result["count"] = count
+    result["next"] = has_next
 
     return result
 
