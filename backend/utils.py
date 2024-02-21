@@ -59,7 +59,7 @@ class Paginator:
     def _calc_pages(self) -> int:
         """Get number of pages"""
 
-        if self.__limit is not None and self.__count > self.__limit:
+        if self.__limit and self.__count > self.__limit:
             self.__pages = math.ceil(self.__count / self.__limit)
             return self.__pages
         return self.__pages
@@ -96,8 +96,10 @@ class Paginator:
         """Generate dict with params for the next page
 
         Returns:
-            dict[str, int] | None: Return `None` if unable to generate.
+            dict[str, int] | None: Return `None` if unable to generate or doesn't have next.
         """
+        if not self.has_next:
+            return None
 
         if not self.__offset and self.__limit:
             offset = self.__limit
