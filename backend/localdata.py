@@ -16,7 +16,7 @@ from backend.db_config import TContent, THeaders, TRequestedURL, db_engine
 from backend.dependencies import lock1, lock2, make_request, request_headers
 from backend.schemas import CreatedOutput, DataForRequest, PokemonDetailed, ResponseData
 from backend.shared_config import CACHE_TTL, HOST
-from backend.ulits import b64d, b64e, generate_hash
+from backend.utils import b64d, b64e, generate_hash
 
 
 # NOTE: 600 ms response time (no cache)

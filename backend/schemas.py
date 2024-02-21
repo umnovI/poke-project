@@ -6,7 +6,7 @@ from typing import Annotated, Any
 
 from pydantic import BaseModel, BeforeValidator, StrictBool, computed_field
 
-from backend.ulits import generate_hash
+from backend.utils import generate_hash
 
 
 class BaseFields(BaseModel):

@@ -14,7 +14,7 @@ from sqlmodel import Session as SQLSession
 
 from backend.db_config import TPartialContent, db_engine
 from backend.schemas import DataForRequest, Hosts, RemoteError, ResponseData, ResponseHeaders, ResponseMedia
-from backend.ulits import b64d, b64e
+from backend.utils import b64d, b64e
 
 
 async def headers_filter(headers: Headers, expected_headers: list[str]) -> dict | None:

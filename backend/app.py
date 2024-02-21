@@ -20,7 +20,7 @@ from backend.localdata import get_local_data
 from backend.schemas import DataForRequest
 from backend.secrets import ANALYTICS_API
 from backend.shared_config import HISHEL_CLIENT
-from backend.ulits import Paginator, generate_hash
+from backend.utils import Paginator, generate_hash
 
 
 @asynccontextmanager
