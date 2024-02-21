@@ -12,7 +12,6 @@ from pydantic import Base64UrlStr, Json
 from thefuzz import process
 from werkzeug.utils import secure_filename
 
-from backend.common import generate_hash
 from backend.db_config import close_db_connections, create_tables
 from backend.dependencies import PaginationQuery, Paginator, etag_compare, make_media_request, make_request
 from backend.endpoints import EndpointName
@@ -21,6 +20,7 @@ from backend.localdata import get_local_data
 from backend.schemas import DataForRequest
 from backend.secrets import ANALYTICS_API
 from backend.shared_config import HISHEL_CLIENT
+from backend.ulits import generate_hash
 
 
 @asynccontextmanager

@@ -19,10 +19,10 @@ from sqlmodel import SQLModel, create_engine
 import backend.api
 import backend.localdata
 from backend.app import EndpointName, app
-from backend.common import generate_hash
 from backend.db_config import TContent, THeaders, TPartialContent, TRequestedURL
 from backend.secrets import TEST_DATABASE_URL
 from backend.shared_config import CACHE_TTL, HOST
+from backend.ulits import generate_hash
 
 pytestmark = pytest.mark.anyio
 
