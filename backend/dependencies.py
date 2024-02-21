@@ -149,7 +149,7 @@ class Paginator:
         self.__pages: int = 1
         self.__cur_page: int = 1
 
-    def _get_pages(self) -> int:
+    def _calc_pages(self) -> int:
         """Get number of pages"""
 
         if self.__limit is not None and self.__count > self.__limit:
@@ -166,7 +166,7 @@ class Paginator:
     def paginate(self) -> list:
         """Return sliced list based on offset and limit"""
 
-        pages = self._get_pages()
+        pages = self._calc_pages()
         if self.__offset and self.__limit:
             self.__cur_page = math.ceil(self.__offset / self.__limit) + 1
             print("Current page: ", self.__cur_page, "of ", pages)
