@@ -61,7 +61,6 @@ class Paginator:
 
         if self.__limit and self.__count > self.__limit:
             self.__pages = math.ceil(self.__count / self.__limit)
-            return self.__pages
         return self.__pages
 
     @property
