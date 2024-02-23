@@ -23,7 +23,7 @@ export default function Items({
       axios(
         `/api/pokemon-detailed/?offset=${currentOffset}&limit=${itemsPerPage}`
       ),
-    { retry: false }
+    { retry: false, staleTime: Infinity, refetchOnWindowFocus: false }
   );
   const onPageChange = (page) => {
     console.log("onPageChange has been triggered.");

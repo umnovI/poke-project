@@ -22,7 +22,12 @@ export default function Component({
       axios(
         `/api/search/pokemon/?q=${query}&offset=${currentOffset}&limit=${itemsPerPage}`
       ),
-    { retry: false, enabled: Boolean(query) }
+    {
+      retry: false,
+      enabled: Boolean(query),
+      staleTime: Infinity,
+      refetchOnWindowFocus: false,
+    }
   );
 
   function handleSearchClick(event) {
