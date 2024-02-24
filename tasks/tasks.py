@@ -11,7 +11,7 @@ from difflib import unified_diff
 import yaml
 from invoke import task  # pyright: ignore[reportPrivateImportUsage]
 
-from .dependencies import date_checker, set_timer, user_confirm
+from ._utils import date_checker, set_timer, user_confirm
 
 
 @task()
