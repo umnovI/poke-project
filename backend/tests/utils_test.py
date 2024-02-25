@@ -1,6 +1,7 @@
 from hmac import compare_digest
 from typing import Any
 
+import allure
 import pytest
 from pydantic import BaseModel
 
@@ -31,6 +32,7 @@ class PaginatorExpected(BaseModel):
         (("test", {"t": "t2"}), ("test", {"t": "t"}), False),
     ],
 )
+@allure.title("Test Hash for {req1} and {req2}")
 def test_generate_hash(
     req1: tuple,
     req2: tuple,
@@ -193,6 +195,7 @@ dummy_list_count = len(dummy_list1)
         ),
     ],
 )
+@allure.title("Test Pagination (offset: {offset}, limit: {limit})")
 def test_paginator(items: list, limit: int, offset: int, expected: PaginatorExpected):
     paginator = Paginator(items, limit, offset)
     assert paginator.paginate() == expected.paginate

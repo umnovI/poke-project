@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, Literal
 from urllib import parse
 
+import allure
 import pytest
 from hishel._utils import generate_key
 from httpcore import Request
@@ -29,12 +30,14 @@ pytestmark = pytest.mark.anyio
 
 
 @pytest.fixture(scope="session")
+@allure.title("Session scoped monkeypatch.")
 def monkeysession():
     with pytest.MonkeyPatch.context() as mp:
         yield mp
 
 
 @pytest.fixture(scope="session")
+@allure.title("Database engine.")
 def db_engine():
     engine = create_engine(TEST_DATABASE_URL)
     SQLModel.metadata.create_all(engine)
@@ -44,12 +47,14 @@ def db_engine():
 
 
 @pytest.fixture(scope="function")
+@allure.title("Database session.")
 def db_session(db_engine: Engine):
     with SQLSession(db_engine) as session:
         yield session
 
 
 @pytest.fixture(scope="function", autouse=True)
+@allure.title("Patching app's database session to test's database session.")
 def patched_db_session(db_session: SQLSession, monkeypatch: pytest.MonkeyPatch):
     def get_db_session_override(*args):  # pylint: disable=W0613
         return db_session
@@ -60,6 +65,7 @@ def patched_db_session(db_session: SQLSession, monkeypatch: pytest.MonkeyPatch):
 
 
 @pytest.fixture(scope="session")
+@allure.title("HTTPX async client.")
 async def client():
     http_client = AsyncClient(
         transport=ASGITransport(app=app),  # type: ignore (Incompatible types?)
@@ -71,6 +77,7 @@ async def client():
 
 
 @pytest.fixture()
+@allure.title("Override `CACHE_TTL` variable.")
 def cache_ttl_override(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setitem(CACHE_TTL, "11days", 0)
 
@@ -79,6 +86,7 @@ def cache_ttl_override(monkeypatch: pytest.MonkeyPatch):
 
 
 @pytest.mark.dependency()
+@allure.title("Test if TTL override works.")
 async def test_cache_ttl_override(cache_ttl_override):  # pylint: disable=W0613
     assert CACHE_TTL["11days"] == 0
 
@@ -87,6 +95,7 @@ async def test_cache_ttl_override(cache_ttl_override):  # pylint: disable=W0613
 
 
 @pytest.mark.dependency()
+@allure.title("Test if database session works for tests.")
 async def test_database_session(db_session: SQLSession):
     db_session.add_all(
         (
@@ -117,6 +126,7 @@ async def test_database_session(db_session: SQLSession):
 
 
 @pytest.mark.dependency(depends=["test_database_session"])
+@allure.title("Test if database data is persistent.")
 async def test_db_data_accessability_from_another_test(db_session: SQLSession):
     data = db_session.get(TContent, "test_data")
     assert data is not None
