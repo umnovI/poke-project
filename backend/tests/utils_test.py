@@ -42,6 +42,7 @@ def test_generate_hash(
 
 
 dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
+dummy_list_count = len(dummy_list1)
 
 
 @pytest.mark.parametrize(
@@ -54,7 +55,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=4,
                 cur_page=2,
-                count=8,
+                count=dummy_list_count,
                 paginate=["three", "four"],
                 has_next=True,
                 next_params=NextModel(offset=4, limit=2),
@@ -67,7 +68,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=4,
                 cur_page=1,
-                count=8,
+                count=dummy_list_count,
                 paginate=["one", "two"],
                 has_next=True,
                 next_params=NextModel(offset=2, limit=2),
@@ -80,7 +81,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=4,
                 cur_page=4,
-                count=8,
+                count=dummy_list_count,
                 paginate=["seven", "eight"],
                 has_next=False,
                 next_params=None,
@@ -93,7 +94,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=3,
                 cur_page=3,
-                count=8,
+                count=dummy_list_count,
                 paginate=["seven", "eight"],
                 has_next=False,
                 next_params=None,
@@ -106,7 +107,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=4,
                 cur_page=5,
-                count=8,
+                count=dummy_list_count,
                 paginate=[],
                 has_next=False,
                 next_params=None,
@@ -119,7 +120,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=1,
                 cur_page=1,
-                count=8,
+                count=dummy_list_count,
                 paginate=dummy_list1,
                 has_next=False,
                 next_params=None,
@@ -132,7 +133,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=2,
                 cur_page=2,
-                count=8,
+                count=dummy_list_count,
                 paginate=["five", "six", "seven", "eight"],
                 has_next=False,
                 next_params=None,
@@ -145,7 +146,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=1,
                 cur_page=1,
-                count=8,
+                count=dummy_list_count,
                 paginate=dummy_list1,
                 has_next=False,
                 next_params=None,
@@ -158,7 +159,7 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=1,
                 cur_page=1,
-                count=8,
+                count=dummy_list_count,
                 paginate=dummy_list1,
                 has_next=False,
                 next_params=None,
@@ -171,10 +172,23 @@ dummy_list1 = ["one", "two", "three", "four", "five", "six", "seven", "eight"]
             PaginatorExpected(
                 pages=3,
                 cur_page=1,
-                count=8,
+                count=dummy_list_count,
                 paginate=["one", "two", "three"],
                 has_next=True,
                 next_params=NextModel(offset=3, limit=3),
+            ),
+        ),
+        (
+            dummy_list1,
+            2,
+            None,
+            PaginatorExpected(
+                pages=1,
+                cur_page=1,
+                count=dummy_list_count,
+                paginate=dummy_list1,
+                has_next=False,
+                next_params=None,
             ),
         ),
     ],
