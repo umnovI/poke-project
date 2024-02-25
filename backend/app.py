@@ -15,7 +15,6 @@ from werkzeug.utils import secure_filename
 from backend.db_config import close_db_connections, create_tables
 from backend.dependencies import PaginationQuery, etag_compare, make_media_request, make_request
 from backend.endpoints import EndpointName
-from backend.filters import build_found_list
 from backend.localdata import get_local_data
 from backend.schemas import DataForRequest
 from backend.secrets import ANALYTICS_API
@@ -169,14 +168,13 @@ async def get_item_by_search(
     # We need to get icons on them. We can't get this during prev step bc
     # we'd have to go over 1000+ items instead of `limit`
     paginator = Paginator(found, pagination["limit"], pagination["offset"])
-    result = await build_found_list(subject.value, paginator.paginate())
-    result["count"] = paginator.count
-    next_query = paginator.next
-    if next_query and paginator.has_next:
-        result["next"] = f"/api/search/{subject.value}/?{urlencode(query=next_query)}&q={query}"
-    else:
-        result["next"] = None
-
+    result = {
+        "count": paginator.count,
+        "results": [{"name": item[0]} for item in paginator.paginate()],
+        "next": f"/api/search/{subject.value}/?{urlencode(query=paginator.next)}&q={query}"
+        if paginator.has_next and paginator.next
+        else None,
+    }
     return result
 
 
