@@ -2,7 +2,7 @@ from asyncio import Lock
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, Any
-from urllib.parse import quote_plus, urlencode
+from urllib.parse import quote_plus, unquote_plus, urlencode
 
 import ujson
 from api_analytics.fastapi import Analytics
@@ -152,7 +152,9 @@ async def get_item_by_search(
     q: str,
     cache_control: Annotated[str | None, Header()] = None,
 ) -> dict:
-    query: str = quote_plus(q)
+    print("q: ", q)
+    query: str = quote_plus(unquote_plus(q).replace(" ", "-"))
+    print("query: ", query)
     data = await get_local_data(
         "search-list",
         DataForRequest(
