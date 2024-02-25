@@ -151,7 +151,7 @@ async def get_item_by_search(
     pagination: PaginationQuery,
     q: str,
     cache_control: Annotated[str | None, Header()] = None,
-):
+) -> dict:
     query: str = quote_plus(q)
     data = await get_local_data(
         "search-list",
