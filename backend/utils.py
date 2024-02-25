@@ -97,6 +97,7 @@ class Paginator:
         Returns:
             dict[str, int] | None: Return `None` if unable to generate or doesn't have next.
         """
+
         if not self.has_next:
             return None
 
@@ -104,7 +105,7 @@ class Paginator:
             offset = self.__limit
         elif self.__offset and self.__limit:
             offset = self.__offset + self.__limit
-        else:
+        else:  # pragma: no cover
             return None
 
         return {"offset": offset, "limit": self.__limit}

@@ -112,7 +112,7 @@ async def pagination_formatter(
     return {"offset": offset, "limit": limit}
 
 
-async def raise_httpexception(status_code: int, msg: str | None = None) -> None:
+async def raise_httpexception(status_code: int, msg: str | None = None) -> None:  # pragma: no cover
     """Raise HTTPException
 
     Args:

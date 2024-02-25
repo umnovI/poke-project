@@ -5,12 +5,13 @@ import os
 import random
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
+from urllib import parse
 
 import pytest
 from hishel._utils import generate_key
 from httpcore import Request
-from httpx import AsyncClient, Response
+from httpx import ASGITransport, AsyncClient, Response
 from pytest_httpx import HTTPXMock
 from sqlalchemy import Engine
 from sqlmodel import Session as SQLSession
@@ -60,8 +61,11 @@ def patched_db_session(db_session: SQLSession, monkeypatch: pytest.MonkeyPatch):
 
 @pytest.fixture(scope="session")
 async def client():
-    base_url = "http://test"
-    http_client = AsyncClient(app=app, base_url=base_url, headers={"user-agent": "test-script/app-tests"})
+    http_client = AsyncClient(
+        transport=ASGITransport(app=app),  # type: ignore (Incompatible types?)
+        base_url="http://test",
+        headers={"user-agent": "test-script/app-tests"},
+    )
     yield http_client
     await http_client.aclose()
 
@@ -177,10 +181,14 @@ async def test_endpointname(client: AsyncClient):
 
 
 @pytest.mark.dependency()
-@pytest.mark.dependency(depends=["test_endpointname"])
+# @pytest.mark.dependency(depends=["test_endpointname"])
 async def test_pagination(client: AsyncClient):
     response = await client.get("/api/pokemon/?offset=20&limit=20")
     assert response.status_code == 200
+
+    # Select data out of range
+    response = await client.get("/api/pokemon/?offset=4000&limit=20")
+    assert response.status_code == 404
 
 
 @pytest.mark.dependency(depends=["test_endpointname"])
@@ -328,7 +336,7 @@ async def test_pokemon_id_name_encounters(client: AsyncClient, id_name: Literal[
 
 
 @pytest.mark.parametrize("id_", [(1), (2), (3), (4)])
-async def test_media_fetch(client: AsyncClient, id_: Literal[1, 2, 3, 4]):
+async def test_media_fetch(client: AsyncClient, id_: int):
     response = await client.get(f"/api/pokemon/{id_}/")
     assert response.status_code == 200
     r_img1 = await client.get(response.json()["sprites"]["back_default"])
@@ -526,3 +534,158 @@ async def test_get_local_media_200(client: AsyncClient):
 async def test_get_local_media_404(client: AsyncClient):
     response = await client.get("/api/media/?l=notfound.jpg")
     assert response.status_code == 404
+
+
+async def test_media_400(client: AsyncClient):
+    response = await client.get("/api/media/?a")
+    assert response.status_code == 400
+
+
+@pytest.mark.parametrize(
+    "subject, search, expected",
+    [
+        (
+            "pokemon",
+            "pika",
+            {
+                "count": 17,
+                "found": [
+                    "pikachu",
+                    "pikachu-rock-star",
+                    "pikachu-belle",
+                    "pikachu-pop-star",
+                    "pikachu-phd",
+                    "pikachu-libre",
+                    "pikachu-cosplay",
+                    "pikachu-original-cap",
+                    "pikachu-hoenn-cap",
+                    "pikachu-sinnoh-cap",
+                    "pikachu-unova-cap",
+                    "pikachu-kalos-cap",
+                    "pikachu-alola-cap",
+                    "pikachu-partner-cap",
+                    "pikachu-starter",
+                    "pikachu-world-cap",
+                    "pikachu-gmax",
+                ],
+                "next": None,
+            },
+        ),
+        (
+            "pokemon",
+            "null",
+            {
+                "count": 1,
+                "found": ["type-null"],
+                "next": None,
+            },
+        ),
+        (
+            "pokemon",
+            "cat",
+            {
+                "count": 7,
+                "found": [
+                    "caterpie",
+                    "raticate",
+                    "delcatty",
+                    "scatterbug",
+                    "torracat",
+                    "raticate-alola",
+                    "raticate-totem-alola",
+                ],
+                "next": None,
+            },
+        ),
+        (
+            "ability",
+            "battle ar",
+            {
+                "count": 1,
+                "found": ["battle-armor"],
+                "next": None,
+            },
+        ),
+        (
+            "ability",
+            "sta",
+            {
+                "count": 9,
+                "found": [
+                    "static",
+                    "stall",
+                    "slow-start",
+                    "victory-star",
+                    "stance-change",
+                    "stamina",
+                    "stakeout",
+                    "stalwart",
+                    "costar",
+                ],
+                "next": None,
+            },
+        ),
+    ],
+)
+async def test_search_query(client: AsyncClient, subject: str, search: str, expected: dict):
+    response = await client.get(
+        f"/api/search/{subject}/?q={parse.quote_plus(search)}", headers={"Cache-Control": "no-cache"}
+    )
+    assert response.status_code == 200
+    data: dict[str, Any] = response.json()
+    assert data["count"] == expected["count"]
+    assert data["next"] == expected["next"]
+    assert [result["name"] for result in data["results"]] == expected["found"]
+
+
+@pytest.mark.parametrize(
+    "subject, search, offset, limit, expected",
+    [
+        (
+            "berry",
+            "a",
+            None,
+            2,
+            {
+                "count": 30,
+                "found": [
+                    "pecha",
+                    "rawst",
+                ],
+                "next": {"offset": "2", "limit": "2", "q": "a"},
+            },
+        ),
+        (
+            "berry",
+            "la",
+            2,
+            2,
+            {
+                "count": 3,
+                "found": ["lansat"],
+                "next": None,
+            },
+        ),
+    ],
+)
+async def test_search_query_with_pagination(
+    client: AsyncClient, subject: str, search: str, offset: str | None, limit: str | None, expected: dict
+):
+    send_query: dict[str, str] = {"q": parse.quote_plus(search)}
+    if offset:
+        send_query["offset"] = offset
+    if limit:
+        send_query["limit"] = limit
+
+    response = await client.get(
+        f"/api/search/{subject}/?{parse.urlencode(query=send_query)}",
+        headers={"Cache-Control": "no-cache"},
+    )
+    assert response.status_code == 200
+    data: dict[str, Any] = response.json()
+    assert data["count"] == expected["count"]
+    if expected["next"]:
+        assert dict(parse.parse_qsl(parse.urlsplit(data["next"]).query)) == expected["next"]
+    else:
+        assert data["next"] == expected["next"]
+    assert [result["name"] for result in data["results"]] == expected["found"]

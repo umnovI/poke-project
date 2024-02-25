@@ -153,7 +153,7 @@ async def get_item_by_search(
     cache_control: Annotated[str | None, Header()] = None,
 ) -> dict:
     print("q: ", q)
-    query: str = quote_plus(unquote_plus(q).replace(" ", "-"))
+    query: str = quote_plus(unquote_plus(q.lower()).replace(" ", "-"))
     print("query: ", query)
     data = await get_local_data(
         "search-list",
@@ -179,7 +179,7 @@ async def get_item_by_search(
 
 
 @app.get("/api/filter/{subject}/")
-async def get_item_by_filter(subject: EndpointName):
+async def get_item_by_filter(subject: EndpointName):  # pragma: no cover
     return {"subject": subject}
 
 
