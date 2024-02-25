@@ -165,8 +165,6 @@ async def get_item_by_search(
     # Package doesn't support type hints
     # Follow this PR to know if this has changed https://github.com/seatgeek/thefuzz/pull/71
     found: list[tuple] = process.extractBests(query, names, score_cutoff=80, limit=30)  # type: ignore
-    # We need to get icons on them. We can't get this during prev step bc
-    # we'd have to go over 1000+ items instead of `limit`
     paginator = Paginator(found, pagination["limit"], pagination["offset"])
     result = {
         "count": paginator.count,
