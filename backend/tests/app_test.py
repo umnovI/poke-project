@@ -181,7 +181,7 @@ async def test_endpointname(client: AsyncClient):
 
 
 @pytest.mark.dependency()
-# @pytest.mark.dependency(depends=["test_endpointname"])
+@pytest.mark.dependency(depends=["test_endpointname"])
 async def test_pagination(client: AsyncClient):
     response = await client.get("/api/pokemon/?offset=20&limit=20")
     assert response.status_code == 200
