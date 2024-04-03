@@ -1,6 +1,5 @@
 """Pydantic Model Schemas"""
 
-
 from functools import cached_property
 from typing import Annotated, Any
 
